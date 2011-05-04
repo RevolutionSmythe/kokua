@@ -294,7 +294,7 @@ void LLSurface::initTextures()
 		mWaterObjp = (LLVOWater *)gObjectList.createObjectViewer(LLViewerObject::LL_VO_WATER, mRegionp);
 		gPipeline.createObject(mWaterObjp);
 		LLVector3d water_pos_global = from_region_handle(mRegionp->getHandle());
-		water_pos_global += LLVector3d(128.0, 128.0, DEFAULT_WATER_HEIGHT);
+		water_pos_global += LLVector3d(mRegionp->getWidth()/2, mRegionp->getWidth()/2, DEFAULT_WATER_HEIGHT);
 		mWaterObjp->setPositionGlobal(water_pos_global);
 	}
 }
@@ -676,14 +676,22 @@ void LLSurface::decompressDCTPatch(LLBitPack &bitpack, LLGroupHeader *gopp, BOOL
 
 	while (1)
 	{
-		decode_patch_header(bitpack, &ph);
+		decode_patch_header(bitpack, &ph, b_large_patch);
 		if (ph.quant_wbits == END_OF_PATCHES)
 		{
 			break;
 		}
 
-		i = ph.patchids >> 5;
-		j = ph.patchids & 0x1F;
+		if (b_large_patch)
+		{
+			i = ph.patchids >> 16; //x
+			j = ph.patchids & 0xFFFF; //y
+		}
+		else
+		{
+			i = ph.patchids >> 5; //x
+			j = ph.patchids & 0x1F; //y
+		}
 
 		if ((i >= mPatchesPerEdge) || (j >= mPatchesPerEdge))
 		{

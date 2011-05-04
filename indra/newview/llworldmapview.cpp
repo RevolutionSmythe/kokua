@@ -357,7 +357,7 @@ void LLWorldMapView::draw()
 		F32 left =      sPanX + half_width + relative_x;
 		F32 top =       bottom + sMapScale ;
 		F32 right =     left + sMapScale ;
-
+		
 		// Discard if region is outside the screen rectangle (not visible on screen)
 		if ((top < 0.f)   || (bottom > height) ||
 			(right < 0.f) || (left > width)       )

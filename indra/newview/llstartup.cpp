@@ -235,6 +235,8 @@ static BOOL gRememberPassword = TRUE;
 
 static U64 gFirstSimHandle = 0;
 static LLHost gFirstSim;
+static U32 first_sim_size_x = 256;
+static U32 first_sim_size_y = 256;
 static std::string gFirstSimSeedCap;
 static LLVector3 gAgentStartLookAt(1.0f, 0.f, 0.f);
 static std::string gAgentStartLocation = "safe";
@@ -1375,7 +1377,7 @@ bool idle_startup()
 
 		gAgent.initOriginGlobal(from_region_handle(gFirstSimHandle));
 
-		LLWorld::getInstance()->addRegion(gFirstSimHandle, gFirstSim);
+		LLWorld::getInstance()->addRegion(gFirstSimHandle, gFirstSim, first_sim_size_x, first_sim_size_y);
 
 		LLViewerRegion *regionp = LLWorld::getInstance()->getRegionFromHandle(gFirstSimHandle);
 		LL_INFOS("AppInit") << "Adding initial simulator " << regionp->getOriginGlobal() << LL_ENDL;
@@ -3171,6 +3173,15 @@ bool process_login_success_response()
 		gFirstSimHandle = to_region_handle(region_x, region_y);
 	}
 	
+	std::string region_size_x = response["region_size_x"];
+	if(!region_size_x.empty()) {
+		first_sim_size_x = strtoul(region_size_x.c_str(), NULL, 10);
+		LLViewerParcelMgr::getInstance()->init(first_sim_size_x);
+	}
+	
+	std::string region_size_y = response["region_size_y"];
+	if(!region_size_y.empty()) first_sim_size_y = strtoul(region_size_y.c_str(), NULL, 10);
+			
 	const std::string look_at_str = response["look_at"];
 	if (!look_at_str.empty())
 	{

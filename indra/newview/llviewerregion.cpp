@@ -59,6 +59,7 @@
 #include "llurldispatcher.h"
 #include "llviewerobjectlist.h"
 #include "llviewerparceloverlay.h"
+#include "llviewerparcelmgr.h"
 #include "llvlmanager.h"
 #include "llvlcomposition.h"
 #include "llvocache.h"
@@ -250,6 +251,8 @@ LLViewerRegion::LLViewerRegion(const U64 &handle,
 	if (!gNoRender)
 	{
 		mParcelOverlay = new LLViewerParcelOverlay(this, region_width_meters);
+		//Re-init the parcel mgr for this sim
+		LLViewerParcelMgr::getInstance()->init(region_width_meters);
 	}
 	else
 	{

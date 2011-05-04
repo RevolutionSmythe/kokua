@@ -327,7 +327,11 @@ LLSimInfo* LLWorldMap::simInfoFromHandle(const U64 handle)
 	sim_info_map_t::iterator it = mSimInfoMap.find(handle);
 	if (it != mSimInfoMap.end())
 	{
-		return it->second;
+		LLSimInfo* sim_info = (*it).second;
+		if (sim_info)
+		{
+			return sim_info;
+		}
 	}
 	return NULL;
 }
