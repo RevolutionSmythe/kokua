@@ -479,11 +479,16 @@ class WindowsSetup(PlatformSetup):
         'vc90' : {
             'gen' : r'Visual Studio 9 2008',
             'ver' : r'9.0'
+            },
+        'vc100' : {
+            'gen' : r'Visual Studio 10',
+            'ver' : r'10.0'
             }
         }
     gens['vs2003'] = gens['vc71']
     gens['vs2005'] = gens['vc80']
     gens['vs2008'] = gens['vc90']
+    gens['vs2010'] = gens['vc100']
 
     search_path = r'C:\windows'
     exe_suffixes = ('.exe', '.bat', '.com')
@@ -495,22 +500,22 @@ class WindowsSetup(PlatformSetup):
 
     def _get_generator(self):
         if self._generator is None:
-            for version in 'vc80 vc90 vc71'.split():
+            for version in 'vc80 vc90 vc71 vc100'.split():
                 if self.find_visual_studio(version):
                     self._generator = version
                     print 'Building with ', self.gens[version]['gen']
                     break
-                else:
-                    print >> sys.stderr, 'Cannot find a Visual Studio installation, testing for express editions'
-                    for version in 'vc80 vc90 vc71'.split():
-                        if self.find_visual_studio_express(version):
-                            self._generator = version
-                            self.using_express = True
-                            print 'Building with ', self.gens[version]['gen'] , "Express edition"
-                            break
-                        else:
-                            print >> sys.stderr, 'Cannot find any Visual Studio installation'
-                            sys.exit(1)
+        if self._generator is None:
+            print >> sys.stderr, 'Cannot find a Visual Studio installation, testing for express editions'
+            for version in 'vc80 vc90 vc71 vc100'.split():
+                if self.find_visual_studio_express(version):
+                    self._generator = version
+                    self.using_express = True
+                    print 'Building with ', self.gens[version]['gen'] , "Express edition"
+                    break
+        if self._generator is None:
+            print >> sys.stderr, 'Cannot find any Visual Studio installation'
+            sys.exit(1)
         return self._generator
 
     def _set_generator(self, gen):
