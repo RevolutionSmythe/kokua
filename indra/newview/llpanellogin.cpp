@@ -640,6 +640,13 @@ void LLPanelLogin::getFields(LLPointer<LLCredential>& credential,
 			// single username, so this is a 'clear' identifier
 			identifier["type"] = CRED_IDENTIFIER_TYPE_ACCOUNT;
 			identifier["account_name"] = username;
+			authenticator = LLSD::emptyMap();
+			authenticator["type"] = CRED_AUTHENTICATOR_TYPE_HASH;
+			authenticator["algorithm"] = "md5";
+			LLMD5 pass((const U8 *)password.c_str());
+			char md5pass[33];               /* Flawfinder: ignore */
+			pass.hex_digest(md5pass);
+			authenticator["secret"] = md5pass;
 		}
 	}
 	credential = gSecAPIHandler->createCredential(LLGridManager::getInstance()->getGrid(), identifier, authenticator);
