@@ -605,7 +605,7 @@ void LLPanelLogin::getFields(LLPointer<LLCredential>& credential,
 		if (separator_index != username.npos)
 		{
 			last = username.substr(separator_index+1, username.npos);
-		LLStringUtil::trim(last);
+			LLStringUtil::trim(last);
 		}
 		else
 		{
@@ -633,6 +633,13 @@ void LLPanelLogin::getFields(LLPointer<LLCredential>& credential,
 				pass.hex_digest(md5pass);
 				authenticator["secret"] = md5pass;
 			}
+		}
+		else
+		{
+			LL_INFOS2("Credentials", "Authentication") << "account: " << username << LL_ENDL;
+			// single username, so this is a 'clear' identifier
+			identifier["type"] = CRED_IDENTIFIER_TYPE_ACCOUNT;
+			identifier["account_name"] = username;
 		}
 	}
 	credential = gSecAPIHandler->createCredential(LLGridManager::getInstance()->getGrid(), identifier, authenticator);
@@ -1021,7 +1028,12 @@ void LLPanelLogin::onClickConnect(void *)
 			cred->identifierType(identifier_type);
 			LLSD allowed_credential_types;
 			LLGridManager::getInstance()->getLoginIdentifierTypes(allowed_credential_types);
-			
+			if(LLGridManager::getInstance()->isInOpenSim())
+			{
+				// yay correct credential type
+				sInstance->mCallback(0, sInstance->mCallbackData);
+				return;
+			}
 			// check the typed in credential type against the credential types expected by the server.
 			for(LLSD::array_iterator i = allowed_credential_types.beginArray();
 				i != allowed_credential_types.endArray();
