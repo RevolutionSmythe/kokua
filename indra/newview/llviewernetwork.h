@@ -114,6 +114,8 @@ public:
 	void gridInfoResponderCB(GridEntry* grid_data);
 	// add a grid to the list of grids
 	void addGrid(GridEntry* grid_info, AddState state);	
+	// remove a grid from the list of grids
+	void removeGrid(GridEntry* grid_info);	
 
 	// retrieve a map of grid-name <-> label
 	// by default only return the user visible grids

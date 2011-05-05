@@ -148,15 +148,18 @@ LLSD LLCredential::getLoginParams()
 		{
 			// legacy credential
 			result["passwd"] = "$1$" + mAuthenticator["secret"].asString();
-			result["first"] = mIdentifier["first_name"];
-			result["last"] = mIdentifier["last_name"];
-		
+			if(mIdentifier.has("first_name") && mIdentifier.has("last_name"))
+			{
+				result["first"] = mIdentifier["first_name"];
+				result["last"] = mIdentifier["last_name"];
+			}
+			else
+				result["username"] = mIdentifier["account_name"];
 		}
 		else if (mIdentifier["type"].asString() == "account")
 		{
 			result["username"] = mIdentifier["account_name"];
-			result["passwd"] = mAuthenticator["secret"];
-										
+			result["passwd"] = mAuthenticator["secret"];					
 		}
 	}
 	catch (...)

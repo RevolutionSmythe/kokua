@@ -686,12 +686,16 @@ void LLGridManager::addGrid(GridEntry* grid_entry,  AddState state)
 		}
 	}
 */
-
 	if (grid_entry)
 	{
 		delete grid_entry;
 		grid_entry = NULL;
 	}
+}
+void LLGridManager::removeGrid(GridEntry* grid_entry)
+{
+	std::string grid = utf8str_tolower(grid_entry->grid[GRID_VALUE]);
+	mGridList.erase(grid);
 }
 
 //
