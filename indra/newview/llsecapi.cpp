@@ -159,7 +159,14 @@ LLSD LLCredential::getLoginParams()
 		else if (mIdentifier["type"].asString() == "account")
 		{
 			result["username"] = mIdentifier["account_name"];
-			result["passwd"] = mAuthenticator["secret"];					
+			if(mAuthenticator["type"] == CRED_AUTHENTICATOR_TYPE_HASH)
+			{
+				result["passwd"] = "$1$" + mAuthenticator["secret"].asString();
+			}
+			else
+			{
+				result["passwd"] = mAuthenticator["secret"];	
+			}
 		}
 	}
 	catch (...)

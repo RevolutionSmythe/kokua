@@ -589,10 +589,23 @@ void LLPanelLogin::getFields(LLPointer<LLCredential>& credential,
 		
 		if (LLPanelLogin::sInstance->mPasswordModified)
 		{
-			authenticator = LLSD::emptyMap();
-			// password is plaintext
-			authenticator["type"] = CRED_AUTHENTICATOR_TYPE_CLEAR;
-			authenticator["secret"] = password;
+			if(LLGridManager::getInstance()->isInOpenSim())
+			{
+				authenticator = LLSD::emptyMap();
+				authenticator["type"] = CRED_AUTHENTICATOR_TYPE_HASH;
+				authenticator["algorithm"] = "md5";
+				LLMD5 pass((const U8 *)password.c_str());
+				char md5pass[33];               /* Flawfinder: ignore */
+				pass.hex_digest(md5pass);
+				authenticator["secret"] = md5pass;
+			}
+			else
+			{
+				authenticator = LLSD::emptyMap();
+				// password is plaintext
+				authenticator["type"] = CRED_AUTHENTICATOR_TYPE_CLEAR;
+				authenticator["secret"] = password;
+			}
 		}
 	}
 	else
