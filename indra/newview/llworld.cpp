@@ -121,13 +121,13 @@ LLWorld::LLWorld() :
 
 void LLWorld::destroyClass()
 {
-	mHoleWaterObjects.clear();
-	gObjectList.destroy();
 	for(region_list_t::iterator region_it = mRegionList.begin(); region_it != mRegionList.end(); )
 	{
 		LLViewerRegion* region_to_delete = *region_it++;
 		removeRegion(region_to_delete->getHost());
 	}
+	mHoleWaterObjects.clear();
+	gObjectList.destroy();
 	if(LLVOCache::hasInstance())
 	{
 		LLVOCache::getInstance()->destroyClass() ;
@@ -316,6 +316,7 @@ void LLWorld::removeRegion(const LLHost &host)
 		return;
 	}
 
+	regionp->saveObjectCache() ; //force to save objects here in case that the object cache is about to be destroyed.
 	from_region_handle(regionp->getHandle(), &x, &y);
 	llinfos << "Removing region " << x << ":" << y << llendl;
 

@@ -531,7 +531,7 @@ void LLViewerObjectList::processObjectUpdate(LLMessageSystem *mesgsys,
 				objectp->mLocalID = local_id;
 			}
 			processUpdateCore(objectp, user_data, i, update_type, &compressed_dp, justCreated);
-			if (update_type != OUT_TERSE_IMPROVED)
+			//if (update_type != OUT_TERSE_IMPROVED)
 			{
 				objectp->mRegionp->cacheFullUpdate(objectp, compressed_dp);
 			}

@@ -389,6 +389,8 @@ void LLVOCache::removeFromCache(U64 handle)
 
 BOOL LLVOCache::checkRead(LLAPRFile* apr_file, void* src, S32 n_bytes) 
 {
+	if(!apr_file->mFile)
+		return FALSE;
 	if(!check_read(apr_file, src, n_bytes))
 	{
 		delete apr_file ;
@@ -561,6 +563,7 @@ void LLVOCache::readFromCache(U64 handle, const LLUUID& id, LLVOCacheEntry::voca
 	}
 	num_entries = cache_entry_map.size() ;
 
+	llinfos << "Read " << num_entries << " entries from the object cache" << llendl;
 	delete apr_file ;
 	return ;
 }

@@ -202,7 +202,6 @@ class LL_COMMON_API LLAPRFile : boost::noncopyable
 {
 	// make this non copyable since a copy closes the file
 private:
-	apr_file_t* mFile ;
 	LLVolatileAPRPool *mCurrentFilePoolp ; //currently in use apr_pool, could be one of them: sAPRFilePoolp, or a temp pool. 
 
 public:
@@ -232,6 +231,7 @@ private:
 //static components
 //
 public:
+	apr_file_t* mFile ;
 	static LLVolatileAPRPool *sAPRFilePoolp ; //a global apr_pool for APRFile, which is used only when local pool does not exist.
 
 private:
