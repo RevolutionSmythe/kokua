@@ -331,6 +331,7 @@ LLPipeline::LLPipeline() :
 	mAlphaPool(NULL),
 	mSkyPool(NULL),
 	mTerrainPool(NULL),
+	mTerrainWaterPool(NULL),
 	mWaterPool(NULL),
 	mGroundPool(NULL),
 	mSimplePool(NULL),
@@ -464,6 +465,8 @@ void LLPipeline::cleanup()
 	mTerrainPool = NULL;
 	delete mWaterPool;
 	mWaterPool = NULL;
+	delete mTerrainWaterPool;
+	mTerrainWaterPool = NULL;
 	delete mGroundPool;
 	mGroundPool = NULL;
 	delete mSimplePool;
@@ -1036,6 +1039,10 @@ LLDrawPool *LLPipeline::findPool(const U32 type, LLViewerTexture *tex0)
 
 	case LLDrawPool::POOL_TERRAIN:
 		poolp = get_if_there(mTerrainPools, (uintptr_t)tex0, (LLDrawPool*)0 );
+		break;
+
+	case LLDrawPool::POOL_WATERTERRAIN:
+		poolp = mTerrainWaterPool;
 		break;
 
 	case LLDrawPool::POOL_BUMP:
@@ -3920,6 +3927,10 @@ void LLPipeline::addToQuickLookup( LLDrawPool* new_poolp )
 	case LLDrawPool::POOL_TERRAIN:
 		mTerrainPools[ uintptr_t(new_poolp->getTexture()) ] = new_poolp ;
 		break;
+ 
+	case LLDrawPool::POOL_WATERTERRAIN:
+		mTerrainWaterPool = new_poolp ;
+		break;
 
 	case LLDrawPool::POOL_BUMP:
 		if (mBumpPool)
@@ -4067,6 +4078,10 @@ void LLPipeline::removeFromQuickLookup( LLDrawPool* poolp )
 		#else
 			mTerrainPools.erase( (uintptr_t)poolp->getTexture() );
 		#endif
+		break;
+
+	case LLDrawPool::POOL_WATERTERRAIN:
+		mTerrainWaterPool = NULL;
 		break;
 
 	case LLDrawPool::POOL_BUMP:
@@ -5054,6 +5069,7 @@ LLViewerObject* LLPipeline::lineSegmentIntersectInWorld(const LLVector3& start, 
 			if ((j == LLViewerRegion::PARTITION_VOLUME) || 
 				(j == LLViewerRegion::PARTITION_BRIDGE) || 
 				(j == LLViewerRegion::PARTITION_TERRAIN) ||
+				(j == LLViewerRegion::PARTITION_WATERTERRAIN) ||
 				(j == LLViewerRegion::PARTITION_TREE) ||
 				(j == LLViewerRegion::PARTITION_GRASS))  // only check these partitions for now
 			{

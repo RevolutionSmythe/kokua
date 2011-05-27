@@ -29,7 +29,9 @@
 #include "llvosurfacepatch.h"
 
 #include "lldrawpoolterrain.h"
+#include "lldrawpoolwaterterrain.h"
 
+#include "llworld.h"
 #include "lldrawable.h"
 #include "llface.h"
 #include "llprimitive.h"
@@ -42,6 +44,7 @@
 #include "llvovolume.h"
 #include "pipeline.h"
 #include "llspatialpartition.h"
+#include "lldrawpoolwater.h"
 
 F32 LLVOSurfacePatch::sLODFactor = 1.f;
 
@@ -79,7 +82,7 @@ public:
 
 //============================================================================
 
-LLVOSurfacePatch::LLVOSurfacePatch(const LLUUID &id, const LLPCode pcode, LLViewerRegion *regionp)
+LLVOSurfacePatch::LLVOSurfacePatch(const LLUUID &id, const LLPCode pcode, LLViewerRegion *regionp, BOOL IsWater)
 	:	LLStaticViewerObject(id, pcode, regionp),
 		mDirtiedPatch(FALSE),
 		mPool(NULL),
@@ -90,7 +93,8 @@ LLVOSurfacePatch::LLVOSurfacePatch(const LLUUID &id, const LLPCode pcode, LLView
 		mLastNorthStride(0),
 		mLastEastStride(0),
 		mLastStride(0),
-		mLastLength(0)
+		mLastLength(0),
+		mIsWater(IsWater)
 {
 	// Terrain must draw during selection passes so it can block objects behind it.
 	mbCanSelect = TRUE;
@@ -135,8 +139,12 @@ void LLVOSurfacePatch::updateTextures()
 
 LLFacePool *LLVOSurfacePatch::getPool()
 {
-	mPool = (LLDrawPoolTerrain*) gPipeline.getPool(LLDrawPool::POOL_TERRAIN, mPatchp->getSurface()->getSTexture());
-
+    if(!mIsWater)
+		mPool = (LLDrawPoolTerrain*) gPipeline.getPool(LLDrawPool::POOL_TERRAIN, mPatchp->getSurface()->getSTexture());
+	else
+	{
+		mPool = (LLDrawPoolWaterTerrain*) gPipeline.getPool(LLDrawPool::POOL_WATERTERRAIN, mPatchp->getSurface()->getWaterTexture());
+	}
 	return mPool;
 }
 
@@ -145,28 +153,52 @@ LLDrawable *LLVOSurfacePatch::createDrawable(LLPipeline *pipeline)
 {
 	pipeline->allocDrawable(this);
 
-	mDrawable->setRenderType(LLPipeline::RENDER_TYPE_TERRAIN);
-	
-	mBaseComp = llfloor(mPatchp->getMinComposition());
-	S32 min_comp, max_comp, range;
-	min_comp = llfloor(mPatchp->getMinComposition());
-	max_comp = llceil(mPatchp->getMaxComposition());
-	range = (max_comp - min_comp);
-	range++;
-	if (range > 3)
+	if(mIsWater)
 	{
-		if ((mPatchp->getMinComposition() - min_comp) > (max_comp - mPatchp->getMaxComposition()))
+		mDrawable->setRenderType(LLPipeline::RENDER_TYPE_WATERTERRAIN);
+
+		mBaseComp = llfloor(mPatchp->getMinComposition());
+		S32 min_comp, max_comp, range;
+		min_comp = llfloor(mPatchp->getMinComposition());
+		max_comp = llceil(mPatchp->getMaxComposition());
+		range = (max_comp - min_comp);
+		range++;
+		if (range > 3)
 		{
-			// The top side runs over more
-			mBaseComp++;
+			if ((mPatchp->getMinComposition() - min_comp) > (max_comp - mPatchp->getMaxComposition()))
+			{
+				// The top side runs over more
+				mBaseComp++;
+			}
+			range = 3;
 		}
-		range = 3;
+
+		LLFacePool *poolp = getPool();
+		mDrawable->addFace(poolp, mPatchp->getSurface()->getWaterTexture());
 	}
+	else
+	{
+		mDrawable->setRenderType(LLPipeline::RENDER_TYPE_TERRAIN);
+	
+		mBaseComp = llfloor(mPatchp->getMinComposition());
+		S32 min_comp, max_comp, range;
+		min_comp = llfloor(mPatchp->getMinComposition());
+		max_comp = llceil(mPatchp->getMaxComposition());
+		range = (max_comp - min_comp);
+		range++;
+		if (range > 3)
+		{
+			if ((mPatchp->getMinComposition() - min_comp) > (max_comp - mPatchp->getMaxComposition()))
+			{
+				// The top side runs over more
+				mBaseComp++;
+			}
+			range = 3;
+		}
 
-	LLFacePool *poolp = getPool();
-
-	mDrawable->addFace(poolp, NULL);
-
+		LLFacePool *poolp = getPool();
+		mDrawable->addFace(poolp, NULL);
+	}
 	return mDrawable;
 }
 
@@ -1012,16 +1044,26 @@ void LLVOSurfacePatch::updateSpatialExtents(LLVector3& newMin, LLVector3 &newMax
 
 U32 LLVOSurfacePatch::getPartitionType() const
 { 
-	return LLViewerRegion::PARTITION_TERRAIN; 
+	if(!mIsWater)
+		return LLViewerRegion::PARTITION_TERRAIN; 
+	return LLViewerRegion::PARTITION_WATERTERRAIN; 
 }
 
-LLTerrainPartition::LLTerrainPartition()
+LLTerrainPartition::LLTerrainPartition(BOOL isWater)
 : LLSpatialPartition(LLDrawPoolTerrain::VERTEX_DATA_MASK, FALSE, GL_DYNAMIC_DRAW_ARB)
 {
 	mOcclusionEnabled = FALSE;
 	mInfiniteFarClip = TRUE;
-	mDrawableType = LLPipeline::RENDER_TYPE_TERRAIN;
-	mPartitionType = LLViewerRegion::PARTITION_TERRAIN;
+	if(!isWater)
+	{
+		mDrawableType = LLPipeline::RENDER_TYPE_TERRAIN;
+		mPartitionType = LLViewerRegion::PARTITION_TERRAIN;
+	}
+	else
+	{
+		mDrawableType = LLPipeline::RENDER_TYPE_WATERTERRAIN;
+		mPartitionType = LLViewerRegion::PARTITION_WATERTERRAIN;
+	}
 }
 
 LLVertexBuffer* LLTerrainPartition::createVertexBuffer(U32 type_mask, U32 usage)

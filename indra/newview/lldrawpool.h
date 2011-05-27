@@ -61,6 +61,7 @@ public:
 		POOL_WATER,
 		POOL_GLOW,
 		POOL_ALPHA,
+		POOL_WATERTERRAIN,	
 		NUM_POOL_TYPES,
 		// * invisiprims work by rendering to the depth buffer but not the color buffer, occluding anything rendered after them
 		// - and the LLDrawPool types enum controls what order things are rendered in

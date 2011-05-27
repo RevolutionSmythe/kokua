@@ -67,7 +67,7 @@ class LLGroupHeader;
 class LLSurface 
 {
 public:
-	LLSurface(U32 type, LLViewerRegion *regionp = NULL);
+	LLSurface(U32 type, LLViewerRegion *regionp = NULL, BOOL isWater = FALSE);
 	virtual ~LLSurface();
 
 	static void initClasses(); // Do class initialization for LLSurface and its child classes.
@@ -146,6 +146,8 @@ public:
 	S32 mGridsPerEdge;
 
 	F32 mOOGridsPerEdge;			// Inverse of grids per edge
+
+	BOOL mIsWater;			        // Whether this is the water surface map
 
 	S32 mPatchesPerEdge;			// Number of patches on one side of a region
 	S32 mNumberOfPatches;			// Total number of patches

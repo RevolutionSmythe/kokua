@@ -4801,7 +4801,7 @@ void LLPickInfo::fetchResults()
 	}
 	else if (objectp)
 	{
-		if( objectp->getPCode() == LLViewerObject::LL_VO_SURFACE_PATCH )
+		if( objectp->getPCode() == LLViewerObject::LL_VO_SURFACE_PATCH)
 		{
 			// Hit land
 			mPickType = PICK_LAND;

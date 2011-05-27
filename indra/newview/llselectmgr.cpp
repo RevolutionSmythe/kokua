@@ -799,7 +799,8 @@ LLObjectSelectionHandle LLSelectMgr::setHoverObject(LLViewerObject *objectp, S32
 	}
 
 	// Can't select land
-	if (objectp->getPCode() == LLViewerObject::LL_VO_SURFACE_PATCH)
+	if (objectp->getPCode() == LLViewerObject::LL_VO_SURFACE_PATCH ||
+		objectp->getPCode() == LLViewerObject::LL_VO_WATER_SURFACE_PATCH)
 	{
 		mHoverObjects->deleteAllNodes();
 		return NULL;
@@ -5899,7 +5900,8 @@ BOOL LLSelectMgr::canSelectObject(LLViewerObject* object)
 	if (object->isAvatar()) return FALSE;
 
 	// Can't select land
-	if (object->getPCode() == LLViewerObject::LL_VO_SURFACE_PATCH) return FALSE;
+	if (object->getPCode() == LLViewerObject::LL_VO_SURFACE_PATCH ||
+		object->getPCode() == LLViewerObject::LL_VO_WATER_SURFACE_PATCH) return FALSE;
 
 	ESelectType selection_type = getSelectTypeForObject(object);
 	if (mSelectedObjects->getObjectCount() > 0 && mSelectedObjects->mSelectType != selection_type) return FALSE;

@@ -2614,6 +2614,7 @@ void renderBoundingBox(LLDrawable* drawable, BOOL set_color = TRUE)
 						break;
 				case LLViewerObject::LL_VO_VOID_WATER:
 				case LLViewerObject::LL_VO_WATER:
+				case LLViewerObject::LL_VO_WATER_SURFACE_PATCH:
 						gGL.color4f(0,0.5f,1,1);
 						break;
 				case LL_PCODE_LEGACY_TREE:

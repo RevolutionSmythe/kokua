@@ -128,7 +128,7 @@ public:
 	U32 getRenderStride() const;
 	S32 getRenderLevel() const;
 
-	void setSurface(LLSurface *surfacep);
+	void setSurface(LLSurface *surfacep, BOOL isWater);
 	void setDataZ(F32 *data_z)					{ mDataZ = data_z; }
 	void setDataNorm(LLVector3 *data_norm)		{ mDataNorm = data_norm; }
 	F32 *getDataZ() const						{ return mDataZ; }
@@ -179,6 +179,7 @@ protected:
 	U64 mLastUpdateTime;	// Time patch was last updated
 
 	LLSurface *mSurfacep; // Pointer to "parent" surface
+	BOOL mIsWater;
 };
 
 

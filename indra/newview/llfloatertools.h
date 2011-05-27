@@ -162,6 +162,7 @@ public:
 
 	// Land buttons
 	LLRadioGroup*	mRadioGroupLand;
+	LLRadioGroup*	mRadioGroupType;
 	LLSlider		*mSliderDozerSize;
 	LLSlider		*mSliderDozerForce;
 

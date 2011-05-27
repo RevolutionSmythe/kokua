@@ -48,7 +48,7 @@ public:
 							(1 << LLVertexBuffer::TYPE_COLOR) 
 	};
 
-	LLVOSurfacePatch(const LLUUID &id, const LLPCode pcode, LLViewerRegion *regionp);
+	LLVOSurfacePatch(const LLUUID &id, const LLPCode pcode, LLViewerRegion *regionp, BOOL isWater);
 
 	/*virtual*/ void markDead();
 
@@ -92,6 +92,7 @@ public:
 		);
 
 	BOOL			mDirtiedPatch;
+	BOOL			mIsWater;
 protected:
 	~LLVOSurfacePatch();
 

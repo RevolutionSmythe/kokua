@@ -170,7 +170,9 @@ LLViewerObject *LLViewerObject::createObject(const LLUUID &id, const LLPCode pco
 	case LL_VO_CLOUDS:
 	  res = new LLVOClouds(id, pcode, regionp); break;
 	case LL_VO_SURFACE_PATCH:
-	  res = new LLVOSurfacePatch(id, pcode, regionp); break;
+	  res = new LLVOSurfacePatch(id, pcode, regionp, FALSE); break;
+	case LL_VO_WATER_SURFACE_PATCH:
+	  res = new LLVOSurfacePatch(id, pcode, regionp, TRUE); break;
 	case LL_VO_SKY:
 	  res = new LLVOSky(id, pcode, regionp); break;
 	case LL_VO_VOID_WATER:

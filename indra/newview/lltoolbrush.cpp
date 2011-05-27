@@ -76,6 +76,7 @@ enum
 	E_LAND_NOISE	= 4,
 	E_LAND_REVERT	= 5,
 	E_LAND_INVALID 	= 6,
+	E_WATER_BRUSH 	= 128,
 };
 const LLColor4 OVERLAY_COLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -151,6 +152,15 @@ void LLToolBrushLand::modifyLandAtPointGlobal(const LLVector3d &pos_global,
 		default:
 			action = E_LAND_INVALID;
 			break;
+		}
+		S32 radioType = gSavedSettings.getS32("RadioLandBrushType");
+		switch (radioType)
+		{
+			case 0: //Land, do nothing
+				break;
+			case 1: //Water, add E_WATER_BRUSH
+				action += E_WATER_BRUSH;
+				break;
 		}
 
 		// Don't send a message to the region if nothing changed.

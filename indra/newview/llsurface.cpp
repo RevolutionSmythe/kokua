@@ -66,7 +66,7 @@ F32 LLSurface::sTextureUpdateTime = 0.f;
 
 // ---------------- LLSurface:: Public Members ---------------
 
-LLSurface::LLSurface(U32 type, LLViewerRegion *regionp) :
+LLSurface::LLSurface(U32 type, LLViewerRegion *regionp, BOOL isWater) :
 	mGridsPerEdge(0),
 	mOOGridsPerEdge(0.f),
 	mPatchesPerEdge(0),
@@ -79,7 +79,8 @@ LLSurface::LLSurface(U32 type, LLViewerRegion *regionp) :
 	mGridsPerPatchEdge(0),
 	mMetersPerGrid(1.0f),
 	mMetersPerEdge(1.0f),
-	mRegionp(regionp)
+	mRegionp(regionp),
+	mIsWater(isWater)
 {
 	// Surface data
 	mSurfaceZ = NULL;
@@ -210,6 +211,12 @@ void LLSurface::create(const S32 grids_per_edge,
 
 LLViewerTexture* LLSurface::getSTexture()
 {
+	if(mIsWater)
+	{
+		LLViewerTexture* text = getWaterTexture();
+		mSTexturep = text;
+		return text;
+	}
 	if (mSTexturep.notNull() && !mSTexturep->hasGLTexture())
 	{
 		createSTexture();
@@ -1001,7 +1008,7 @@ void LLSurface::createPatchData()
 		for (i=0; i<mPatchesPerEdge; i++) 
 		{
 			patchp = getPatch(i, j);
-			patchp->setSurface(this);
+			patchp->setSurface(this, mIsWater);
 		}
 	}
 

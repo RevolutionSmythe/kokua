@@ -41,6 +41,7 @@
 #include "lldrawpoolsky.h"
 #include "lldrawpooltree.h"
 #include "lldrawpoolterrain.h"
+#include "lldrawpoolwaterterrain.h"
 #include "lldrawpoolwater.h"
 #include "llface.h"
 #include "llviewerobjectlist.h" // For debug listing.
@@ -82,6 +83,9 @@ LLDrawPool *LLDrawPool::createPool(const U32 type, LLViewerTexture *tex0)
 		break;
 	case POOL_TREE:
 		poolp = new LLDrawPoolTree(tex0);
+		break;
+	case POOL_WATERTERRAIN:
+		poolp = new LLDrawPoolWaterTerrain();
 		break;
 	case POOL_TERRAIN:
 		poolp = new LLDrawPoolTerrain(tex0);

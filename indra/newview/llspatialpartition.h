@@ -562,7 +562,7 @@ public:
 class LLTerrainPartition : public LLSpatialPartition
 {
 public:
-	LLTerrainPartition();
+	LLTerrainPartition(BOOL isWater);
 	virtual void getGeometry(LLSpatialGroup* group);
 	virtual LLVertexBuffer* createVertexBuffer(U32 type_mask, U32 usage);
 };

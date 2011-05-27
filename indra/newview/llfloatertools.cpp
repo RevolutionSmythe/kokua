@@ -113,6 +113,7 @@ void commit_radio_group_focus(LLUICtrl* ctrl);
 void commit_radio_group_move(LLUICtrl* ctrl);
 void commit_radio_group_edit(LLUICtrl* ctrl);
 void commit_radio_group_land(LLUICtrl* ctrl);
+void commit_radio_type(LLUICtrl* ctrl);
 void commit_grid_mode(LLUICtrl *);
 void commit_slider_zoom(LLUICtrl *ctrl);
 
@@ -257,6 +258,7 @@ BOOL	LLFloaterTools::postBuild()
 	getChild<LLUICtrl>("checkbox copy rotates")->setValue((BOOL)gSavedSettings.getBOOL("CreateToolCopyRotates"));
 
 	mRadioGroupLand			= getChild<LLRadioGroup>("land_radio_group");
+	mRadioGroupType			= getChild<LLRadioGroup>("type_radio_group");
 	mBtnApplyToSelection	= getChild<LLButton>("button apply to selection");
 	mSliderDozerSize		= getChild<LLSlider>("slider brush size");
 	getChild<LLUICtrl>("slider brush size")->setValue(gSavedSettings.getF32("LandBrushSize"));
@@ -324,6 +326,7 @@ LLFloaterTools::LLFloaterTools(const LLSD& key)
 	mCheckCopyCenters(NULL),
 	mCheckCopyRotates(NULL),
 	mRadioGroupLand(NULL),
+	mRadioGroupType(NULL),
 	mSliderDozerSize(NULL),
 	mSliderDozerForce(NULL),
 	mBtnApplyToSelection(NULL),
@@ -361,6 +364,7 @@ LLFloaterTools::LLFloaterTools(const LLSD& key)
 	mCommitCallbackRegistrar.add("BuildTool.applyToSelection",	boost::bind(&click_apply_to_selection, this));
 	mCommitCallbackRegistrar.add("BuildTool.gridMode",			boost::bind(&commit_grid_mode,_1));
 	mCommitCallbackRegistrar.add("BuildTool.commitRadioLand",	boost::bind(&commit_radio_group_land,_1));
+	mCommitCallbackRegistrar.add("BuildTool.commitRadioType",	boost::bind(&commit_radio_type,_1));
 	mCommitCallbackRegistrar.add("BuildTool.LandBrushForce",	boost::bind(&commit_slider_dozer_force,_1));
 	mCommitCallbackRegistrar.add("BuildTool.AddMedia",			boost::bind(&LLFloaterTools::onClickBtnAddMedia,this));
 	mCommitCallbackRegistrar.add("BuildTool.DeleteMedia",		boost::bind(&LLFloaterTools::onClickBtnDeleteMedia,this));
@@ -667,12 +671,23 @@ void LLFloaterTools::updatePopup(LLCoordGL center, MASK mask)
 	if (mBtnLand)	mBtnLand	->setToggleState( land_visible );
 
 	mRadioGroupLand->setVisible( land_visible );
+	mRadioGroupType->setVisible( land_visible );
 	if ( tool == LLToolSelectLand::getInstance() )
 	{
 		mRadioGroupLand->setValue("radio select land");
 	}
 	else if ( tool == LLToolBrushLand::getInstance() )
 	{
+		S32 dozer_type = gSavedSettings.getS32("RadioLandBrushType");
+		switch(dozer_type)
+		{
+			case 0:
+				mRadioGroupType->setValue("radio land");
+				break;
+			case 1:
+				mRadioGroupType->setValue("radio water");
+				break;
+		}
 		S32 dozer_mode = gSavedSettings.getS32("RadioLandBrushAction");
 		switch(dozer_mode)
 		{
@@ -923,6 +938,22 @@ void commit_radio_group_land(LLUICtrl* ctrl)
 			dozer_mode = 5;
 		gSavedSettings.setS32("RadioLandBrushAction", dozer_mode);
 	}
+}
+
+void commit_radio_type(LLUICtrl* ctrl)
+{
+	LLRadioGroup* group = (LLRadioGroup*)ctrl;
+	std::string selected = group->getValue().asString();
+	S32 dozer_type = gSavedSettings.getS32("RadioLandBrushType");
+	if (selected == "radio land")
+	{
+		dozer_type = 0;
+	}
+	else
+	{
+		dozer_type = 1;
+	}
+	gSavedSettings.setS32("RadioLandBrushType", dozer_type);
 }
 
 void commit_select_component(void *data)

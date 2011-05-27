@@ -233,7 +233,8 @@ LLViewerRegion::LLViewerRegion(const U64 &handle,
 	mOriginGlobal = from_region_handle(handle); 
 	updateRenderMatrix();
 
-	mLandp = new LLSurface('l', NULL);
+	mLandp = new LLSurface('l', NULL, false);
+	mWaterp = new LLSurface('w', NULL, true);
 	if (!gNoRender)
 	{
 		// Create the composition layer for the surface
@@ -243,6 +244,11 @@ LLViewerRegion::LLViewerRegion(const U64 &handle,
 		// Create the surfaces
 		mLandp->setRegion(this);
 		mLandp->create(grids_per_region_edge,
+						grids_per_patch_edge,
+						mOriginGlobal,
+						mWidth);
+		mWaterp->setRegion(this);
+		mWaterp->create(grids_per_region_edge,
 						grids_per_patch_edge,
 						mOriginGlobal,
 						mWidth);
@@ -268,7 +274,7 @@ LLViewerRegion::LLViewerRegion(const U64 &handle,
 	//create object partitions
 	//MUST MATCH declaration of eObjectPartitions
 	mObjectPartition.push_back(new LLHUDPartition());		//PARTITION_HUD
-	mObjectPartition.push_back(new LLTerrainPartition());	//PARTITION_TERRAIN
+	mObjectPartition.push_back(new LLTerrainPartition(FALSE));	//PARTITION_TERRAIN
 	mObjectPartition.push_back(new LLVoidWaterPartition());	//PARTITION_VOIDWATER
 	mObjectPartition.push_back(new LLWaterPartition());		//PARTITION_WATER
 	mObjectPartition.push_back(new LLTreePartition());		//PARTITION_TREE
@@ -279,6 +285,7 @@ LLViewerRegion::LLViewerRegion(const U64 &handle,
 	mObjectPartition.push_back(new LLBridgePartition());	//PARTITION_BRIDGE
 	mObjectPartition.push_back(new LLHUDParticlePartition());//PARTITION_HUD_PARTICLE
 	mObjectPartition.push_back(NULL);						//PARTITION_NONE
+	mObjectPartition.push_back(new LLTerrainPartition(TRUE));	//PARTITION_WATERTERRAIN
 }
 
 
@@ -316,6 +323,7 @@ LLViewerRegion::~LLViewerRegion()
 	delete mCompositionp;
 	delete mParcelOverlay;
 	delete mLandp;
+	delete mWaterp;
 	delete mEventPoll;
 	LLHTTPSender::clearSender(mHost);
 	
@@ -414,6 +422,7 @@ void LLViewerRegion::setOriginGlobal(const LLVector3d &origin_global)
 	mOriginGlobal = origin_global; 
 	updateRenderMatrix();
 	mLandp->setOriginGlobal(origin_global);
+	mWaterp->setOriginGlobal(origin_global);
 	mWind.setOriginGlobal(origin_global);
 	mCloudLayer.setOriginGlobal(origin_global);
 	calculateCenterGlobal();
@@ -1327,6 +1336,7 @@ void LLViewerRegion::unpackRegionHandshake()
 		if (compp->getParamsReady())
 		{
 			getLand().dirtyAllPatches();
+			getWater().dirtyAllPatches();
 		}
 		else
 		{

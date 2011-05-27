@@ -83,6 +83,7 @@ public:
 		PARTITION_BRIDGE,
 		PARTITION_HUD_PARTICLE,
 		PARTITION_NONE,
+		PARTITION_WATERTERRAIN,
 		NUM_PARTITIONS
 	} eObjectPartitions;
 
@@ -248,6 +249,7 @@ public:
 	const U64 		&getHandle() const 			{ return mHandle; }
 
 	LLSurface		&getLand() const			{ return *mLandp; }
+	LLSurface		&getWater() const			{ return *mWaterp; }
 
 	// set and get the region id
 	const LLUUID& getRegionID() const { return mRegionID; }
@@ -331,6 +333,7 @@ public:
 private:
 	// The surfaces and other layers
 	LLSurface*	mLandp;
+	LLSurface*	mWaterp;
 
 	// Region geometry data
 	LLVector3d	mOriginGlobal;	// Location of southwest corner of region (meters)

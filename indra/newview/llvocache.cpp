@@ -389,11 +389,11 @@ void LLVOCache::removeFromCache(U64 handle)
 
 BOOL LLVOCache::checkRead(LLAPRFile* apr_file, void* src, S32 n_bytes) 
 {
-	if(!apr_file->mFile)
-		return FALSE;
 	if(!check_read(apr_file, src, n_bytes))
 	{
 		delete apr_file ;
+		if(!apr_file->mFile)
+			return FALSE;
 		removeCache() ;
 		return FALSE ;
 	}

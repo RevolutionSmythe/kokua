@@ -351,6 +351,7 @@ public:
 		RENDER_TYPE_WL_SKY						= LLDrawPool::POOL_WL_SKY,
 		RENDER_TYPE_GROUND						= LLDrawPool::POOL_GROUND,	
 		RENDER_TYPE_TERRAIN						= LLDrawPool::POOL_TERRAIN,
+		RENDER_TYPE_WATERTERRAIN				= LLDrawPool::POOL_WATERTERRAIN,
 		RENDER_TYPE_SIMPLE						= LLDrawPool::POOL_SIMPLE,
 		RENDER_TYPE_GRASS						= LLDrawPool::POOL_GRASS,
 		RENDER_TYPE_FULLBRIGHT					= LLDrawPool::POOL_FULLBRIGHT,
@@ -674,6 +675,7 @@ protected:
 	LLDrawPool*					mSkyPool;
 	LLDrawPool*					mTerrainPool;
 	LLDrawPool*					mWaterPool;
+	LLDrawPool*                 mTerrainWaterPool;
 	LLDrawPool*					mGroundPool;
 	LLRenderPass*				mSimplePool;
 	LLRenderPass*				mGrassPool;

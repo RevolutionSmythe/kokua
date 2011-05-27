@@ -113,14 +113,18 @@ void LLSurfacePatch::dirty()
 }
 
 
-void LLSurfacePatch::setSurface(LLSurface *surfacep)
+void LLSurfacePatch::setSurface(LLSurface *surfacep, BOOL isWater)
 {
 	mSurfacep = surfacep;
+	mIsWater = isWater;
 	if (mVObjp == (LLVOSurfacePatch *)NULL)
 	{
-		llassert(mSurfacep->mType == 'l');
-
-		mVObjp = (LLVOSurfacePatch *)gObjectList.createObjectViewer(LLViewerObject::LL_VO_SURFACE_PATCH, mSurfacep->getRegion());
+		if(isWater)
+		{
+			mVObjp = (LLVOSurfacePatch *)gObjectList.createObjectViewer(LLViewerObject::LL_VO_WATER_SURFACE_PATCH, mSurfacep->getRegion());
+		}
+		else
+			mVObjp = (LLVOSurfacePatch *)gObjectList.createObjectViewer(LLViewerObject::LL_VO_SURFACE_PATCH, mSurfacep->getRegion());
 		mVObjp->setPatch(this);
 		mVObjp->setPositionRegion(mCenterRegion);
 		gPipeline.createObject(mVObjp);
@@ -450,10 +454,6 @@ void LLSurfacePatch::updateVerticalStats()
 
 void LLSurfacePatch::updateNormals() 
 {
-	if (mSurfacep->mType == 'w')
-	{
-		return;
-	}
 	U32 grids_per_patch_edge = mSurfacep->getGridsPerPatchEdge();
 	U32 grids_per_edge = mSurfacep->getGridsPerEdge();
 
@@ -676,7 +676,7 @@ void LLSurfacePatch::updateNorthEdge()
 
 BOOL LLSurfacePatch::updateTexture()
 {
-	if (mSTexUpdate)		//  Update texture as needed
+	if (!mIsWater && mSTexUpdate)		//  Update texture as needed
 	{
 		F32 meters_per_grid = getSurface()->getMetersPerGrid();
 		F32 grids_per_patch_edge = (F32)getSurface()->getGridsPerPatchEdge();
@@ -714,6 +714,16 @@ BOOL LLSurfacePatch::updateTexture()
 					return TRUE;
 				}
 			}
+		}
+		return FALSE;
+	}
+	else if(mIsWater && mSTexUpdate)
+	{
+		if (mVObjp)
+		{
+			mVObjp->dirtyGeom();
+			gPipeline.markGLRebuild(mVObjp);
+			return TRUE;
 		}
 		return FALSE;
 	}
